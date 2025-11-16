@@ -37,20 +37,19 @@ app.get('/api/file', (req, res) => {
             res.status(500).send('Error parsing JSON');
             return;
         }
-        console.log(data, jsonData);
-        // if (!Array.isArray(jsonData)) {
-        //     res.status(500).send('File content is not a valid JSON array');
-        //     return;
-        // }
 
         res.send(jsonData);
     });
 });
-// fs.writeFile('hello.txt', content, err => {
-//     if (err) {
-//         console.error(err);
-//         res.status(500).send('Error writing file');
-//         return;
-//     }
-//     res.send('File written successfully');
-// });
+
+app.post('/api/write', (req, res) => {
+    const jsonData = JSON.stringify(req.body, null, 2);
+    fs.writeFile('hello.json', jsonData, err => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error writing file');
+            return;
+        }
+        res.send('File written successfully');
+    });
+});
