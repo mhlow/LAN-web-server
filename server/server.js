@@ -53,3 +53,7 @@ app.post('/api/write', (req, res) => {
         res.send('File written successfully');
     });
 });
+
+app.post('/api/submit-user', (req, res) => {
+    // implement later
+});

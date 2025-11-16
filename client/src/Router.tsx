@@ -1,12 +1,16 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from './App';
 import BackendTest from './pages/BackendTest';
+import Home from './pages/Home';
+import QuizHome from './pages/quiz/QuizHome';
 
 function Router() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<App />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/quiz" element={<QuizHome />} />
+
+
                 <Route path="/backend-test" element={<BackendTest />} />
             </Routes>
         </BrowserRouter>
