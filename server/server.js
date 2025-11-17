@@ -1,3 +1,5 @@
+// Can use socket.io
+
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -54,6 +56,21 @@ app.post('/api/write', (req, res) => {
     });
 });
 
-app.post('/api/submit-user', (req, res) => {
-    // implement later
+app.get('/api/quiz-questions', (req, res) => {
+    fs.readFile('data/quiz/quiz_questions.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error reading file');
+            return;
+        }
+        let jsonData;
+        try {
+            jsonData = JSON.parse(data);
+        } catch (parseErr) {
+            console.error(parseErr);
+            res.status(500).send('Error parsing JSON');
+            return;
+        }  
+        res.send(jsonData);
+    });
 });
