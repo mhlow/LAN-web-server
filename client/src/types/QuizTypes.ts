@@ -1,4 +1,4 @@
-export type QuizQuestion = {
+export type QuizQuestion_t = {
     id: number;
     question: string;
     options: string[];
@@ -6,7 +6,7 @@ export type QuizQuestion = {
     correctAnswerIndex: number;
 };
 
-export type QuestionInfo = {
+export type QuestionInfo_t = {
     id: number;
     question: string;
     options: string[];

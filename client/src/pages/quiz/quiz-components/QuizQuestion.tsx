@@ -1,7 +1,7 @@
 
 
-function QuizQuestion({ questionText, questionTimer }: { questionText: string, questionTimer: number }) {
-    const valid = questionText.length > 0 && questionTimer > 0;
+function QuizQuestion({ questionText }: { questionText: string, }) {
+    const valid = questionText.length > 0;
     if (!valid) {
         return (<div>Invalid question data.</div>);
     }

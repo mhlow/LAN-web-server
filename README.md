@@ -6,6 +6,7 @@ Client server is on port 5173 by default.
 Server is on port 3000 by default.
 
 # ! This is not secure. Do not use this in production or expose it to the internet.
+Importantly, the admin control currently does not have any authentication, so anyone with the link can access it.
 
 ## Features
 - [x] Serve static files over HTTP
