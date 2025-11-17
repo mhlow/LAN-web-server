@@ -41,13 +41,24 @@ function QuizQuestions() {
             console.log("Received quiz reset");
         })
 
+        socket.on("startQuiz", () => {
+            setQuizInProgress(true);
+            console.log("Received quiz started");
+        })
+
+        socket.on("stopQuiz", () => {
+            setQuizInProgress(false);
+            console.log("Received quiz stopped");
+        })
+
         return () => {
             socket.off("nextQuestion");
             socket.off("resetQuiz");
+            socket.off("quizStopped");
         }
     }, [socket]);
 
-
+    // --- Normal stuff ---
     const context = useContext(UserContext);
     if (!context) {
         throw new Error('UserContext must be used within a UserProvider');
@@ -57,6 +68,7 @@ function QuizQuestions() {
     const [quizQuestions, setQuizQuestions] = useState<QuizQuestion_t[]>([]); // Placeholder for quiz questions state
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [quizStage, setQuizStage] = useState<QuizStage_t>('question');
+    const [quizInProgress, setQuizInProgress] = useState<boolean | null>(null);
 
 
 
@@ -80,7 +92,23 @@ function QuizQuestions() {
             }
         }
 
+        async function fetchCurrentState() {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/current-state`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setCurrentQuestionIndex(data.questionIndex);
+                setQuizStage(data.stage);
+                setQuizInProgress(data.inProgress);
+            } catch (error) {
+                console.error('Failed to fetch current state:', error);
+            }
+        }
+
         fetchQuizQuestions();
+        fetchCurrentState();
     }, []);
 
 
@@ -102,6 +130,20 @@ function QuizQuestions() {
                 </div>
                 <div className="flex-1 p-8 flex flex-col bg-amber-50">
                     <p className="text-center text-xl">Please enter a username to access the Quiz.</p>
+                    <a href="/quiz-home">Quiz Home</a>
+                </div>
+            </div>
+        );
+    }
+
+    if (quizInProgress === false) {
+        return (
+            <div className="grow flex flex-col">
+                <div className="p-4 bg-sky-950 text-slate-50">
+                    <h2 className="text-lg font-semibold">Quiz Not In Progress.</h2>
+                </div>
+                <div className="flex-1 p-8 flex flex-col bg-amber-50">
+                    <p className="text-center text-xl">The quiz is currently not in progress. Please wait for the admin to start the quiz.</p>
                     <a href="/quiz-home">Quiz Home</a>
                 </div>
             </div>

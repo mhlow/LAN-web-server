@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
 const QuizStages = ['question', 'answer', 'results'];
 let quizQuestionIndex = 0;
 let quizStage = QuizStages[0];
+let quizInProgress = false;
 
 function nextStage() {
     const currentStageIndex = QuizStages.indexOf(quizStage);
@@ -46,6 +47,19 @@ function nextStage() {
     }
     io.emit('nextQuestion', { questionIndex: quizQuestionIndex, stage: quizStage });
 }
+
+app.post('/api/start-quiz', (req, res) => {
+    console.log('Starting quiz');
+    io.emit('startQuiz');
+    quizInProgress = true;
+    res.send('Start quiz emitted');
+});
+
+app.post('/api/stop-quiz', (req, res) => {
+    io.emit('stopQuiz');
+    quizInProgress = false;
+    res.send('Stop quiz emitted');
+});
 
 app.post('/api/next-stage', (req, res) => {
     nextStage();
@@ -60,7 +74,11 @@ app.post('/api/reset-quiz', (req, res) => {
 });
 
 app.get('/api/current-state', (req, res) => {
-    res.json({ questionIndex: quizQuestionIndex, stage: quizStage });
+    res.json({ questionIndex: quizQuestionIndex, stage: quizStage, inProgress: quizInProgress });
+});
+
+app.get('/api/quiz-in-progress', (req, res) => {
+    res.send(quizInProgress);
 });
 
 // --- Routes ---
