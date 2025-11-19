@@ -1,5 +1,6 @@
 import Image1 from '../../../assets/quiz_images/image1.png';
 import Integral from '../../../assets/quiz_images/integral.png';
+import Stevie from '../../../assets/quiz_images/Stevie.jpg';
 
 function QuizQuestion({ questionText, imagePath, answer }: { questionText: string, imagePath?: string, answer?: string }) {
     let image = undefined;
@@ -7,6 +8,8 @@ function QuizQuestion({ questionText, imagePath, answer }: { questionText: strin
         image = Integral;
     } else if (imagePath === 'image1.png') {
         image = Image1;
+    } else if (imagePath === 'Stevie.jpg') {
+        image = Stevie;
     }
 
     const valid = questionText.length > 0;
