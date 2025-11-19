@@ -4,6 +4,7 @@ export type QuizQuestion_t = {
     options: string[];
     time: number;
     correctAnswerIndex: number;
+    image?: string;
 };
 
 export type QuestionInfo_t = {

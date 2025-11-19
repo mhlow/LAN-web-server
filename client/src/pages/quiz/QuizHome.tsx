@@ -80,7 +80,7 @@ function QuizHome() {
                     <form className="space-y-4" action={handleSubmit}>
                         <div>
                             <label className="block mb-2 font-medium" htmlFor="name">
-                                Give me one word that describes you and one that describes someone else here:
+                                One word to describe yourself:
                             </label>
                             <input
                                 type="text"

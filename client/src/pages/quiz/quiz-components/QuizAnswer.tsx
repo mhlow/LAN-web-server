@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UserContext, type UserContextType } from '../../../hooks/UserContext';
+import { UserContext } from '../../../hooks/UserContext';
 
 function QuizAnswerMulti({ questionOptions, setNextStage }: { questionOptions: string[]; setNextStage: () => void; }) {
     const context = useContext(UserContext);
@@ -51,7 +51,7 @@ function QuizAnswerMulti({ questionOptions, setNextStage }: { questionOptions: s
                 <div className="flex-1 grid grid-cols-2 gap-2 items-stretch flex flex-col">
                     {questionOptions.map((option, index) => (
                         <button key={index} className={`flex-1 p-4 ${colours[index % colours.length]} border border-gray-300 rounded text-left`} onClick={() => handleAnswer(index)}>
-                            {option}
+                            <b className="text-2xl flex justify-center">{option}</b>
                         </button>
                     ))}
 

@@ -44,8 +44,21 @@ function nextStage() {
     } else {
         quizStage = QuizStages[0];
         quizQuestionIndex++;
+        if (quizQuestionIndex >= getTotalQuestions()) {
+            io.emit('quizEnded');
+            quizInProgress = false;
+            quizQuestionIndex = 0;
+            quizStage = QuizStages[0];
+            return;
+        }
     }
     io.emit('nextQuestion', { questionIndex: quizQuestionIndex, stage: quizStage });
+}
+
+function getTotalQuestions() {
+    const data = fs.readFileSync('data/quiz/quiz_questions.json', 'utf8');
+    const questions = JSON.parse(data).questions;
+    return questions.length;
 }
 
 app.post('/api/start-quiz', (req, res) => {
@@ -204,3 +217,47 @@ function getCorrectAnswer(questionIndex) {
     const answer = questions[questionIndex].answer;
     return options.indexOf(answer);
 }
+
+// --- Results ---
+app.post('/api/quiz-results', (req, res) => {
+    const username = req.body.username;
+    const totalQuestions = getTotalQuestions();
+    let score = 0;
+    for (let i = 0; i < totalQuestions; i++) {
+        const answersFilePath = `data/user_scores/quiz_answers_q${i}.json`;
+        if (!fs.existsSync(answersFilePath)) {
+            continue;
+        }
+        const existingData = JSON.parse(fs.readFileSync(answersFilePath, 'utf8'));
+        const userEntry = existingData.find(entry => entry.username === username);
+        if (userEntry) {
+            const correctAnswer = getCorrectAnswer(i);
+            if (userEntry.answer === correctAnswer) {
+                score++;
+            }
+        }
+    }
+    res.json({ score, totalQuestions });
+});
+
+app.get('/api/all-quiz-results', (req, res) => {
+    const totalQuestions = getTotalQuestions();
+    const userScores = {};
+    for (let i = 0; i < totalQuestions; i++) {
+        const answersFilePath = `data/user_scores/quiz_answers_q${i}.json`;
+        if (!fs.existsSync(answersFilePath)) {
+            continue;
+        }
+        const existingData = JSON.parse(fs.readFileSync(answersFilePath, 'utf8'));
+        for (const entry of existingData) {
+            if (!userScores[entry.username]) {
+                userScores[entry.username] = 0;
+            }
+            const correctAnswer = getCorrectAnswer(i);
+            if (entry.answer === correctAnswer) {
+                userScores[entry.username]++;
+            }
+        }
+    }
+    res.json(userScores);
+});
