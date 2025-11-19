@@ -1,6 +1,6 @@
 
 
-function QuizResults({ isCorrect }: { isCorrect: boolean }) {
+function QuizResults({ isCorrect }: { isCorrect: boolean | null; }) {
 
     return (
         <div className="grow flex flex-col">

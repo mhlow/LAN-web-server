@@ -90,7 +90,6 @@ server.listen(PORT, process.env.IP_ADDRESS, () => {
 app.get('/api/', (req, res) => {
     // Create json response
     res.json({ message: 'Hello, world!' });
-    
 });
 
 
@@ -145,3 +144,63 @@ app.get('/api/quiz-questions', (req, res) => {
         res.send(jsonData);
     });
 });
+
+app.post('/api/submit-quiz-answer', (req, res) => {
+    const answerData = req.body;
+    console.log('Received quiz answer:', answerData);
+    const questionIndex = quizQuestionIndex;
+    // Create file if not exists
+    const answersFilePath = `data/user_scores/quiz_answers_q${questionIndex}.json`;
+    if (!fs.existsSync(answersFilePath)) {
+        fs.writeFileSync(answersFilePath, JSON.stringify([]));
+    }
+    // Store in the format [{ username: string, answer: any }]
+    const existingData = JSON.parse(fs.readFileSync(answersFilePath, 'utf8'));
+    // console.log('Existing data:', existingData);
+    // Override if username exists
+    const existingIndex = existingData.findIndex(entry => entry.username === answerData.username);
+    if (existingIndex !== -1) {
+        existingData[existingIndex] = answerData;
+    } else {
+        existingData.push(answerData);
+    }
+    // console.log('Updated data:', existingData);
+    fs.writeFileSync(answersFilePath, JSON.stringify(existingData, null, 2));
+    
+    res.send('Quiz answer received');
+});
+
+app.post('/api/quiz-answers', (req, res) => {
+    const questionIndex = quizQuestionIndex;
+    const username = req.body.username;
+    const answersFilePath = `data/user_scores/quiz_answers_q${questionIndex}.json`;
+
+    const correctAnswer = getCorrectAnswer(questionIndex);
+    console.log(username);
+
+    if (!fs.existsSync(answersFilePath)) {
+        res.json([]);
+        return;
+    }
+    // If the username exists in the answers file, check if their answer is correct
+    const existingData = JSON.parse(fs.readFileSync(answersFilePath, 'utf8'));
+    const userEntry = existingData.find(entry => entry.username === username);
+    if (userEntry) {
+        const isCorrect = userEntry.answer === correctAnswer ? 1 : 0;
+        res.send(isCorrect.toString());
+    } else {
+        res.send('0');
+    }
+});
+
+function getCorrectAnswer(questionIndex) {
+    const answersFilePath = `data/quiz/quiz_questions.json`;
+    const data = fs.readFileSync(answersFilePath, 'utf8');
+    const questions = JSON.parse(data).questions;
+    // Returns the index of the correct answer
+    console.log(questions);
+    
+    const options = questions[questionIndex].options;
+    const answer = questions[questionIndex].answer;
+    return options.indexOf(answer);
+}

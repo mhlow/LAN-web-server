@@ -33,6 +33,10 @@ function QuizQuestions() {
             setCurrentQuestionIndex(questionIndex);
             setQuizStage(stage);
             console.log("Received question change to index:", questionIndex, "stage:", stage);
+            console.log(stage);
+            if (stage === 'results') {
+                checkLastAnswerCorrect();
+            }
         })
 
         socket.on("resetQuiz", () => {
@@ -70,6 +74,29 @@ function QuizQuestions() {
     const [quizStage, setQuizStage] = useState<QuizStage_t>('question');
     const [quizInProgress, setQuizInProgress] = useState<boolean | null>(null);
 
+    const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean | null>(null);
+
+    async function checkLastAnswerCorrect() {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/quiz-answers`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username }),
+            });
+            console.log("Checking last answer correctness for user:", username);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Response is either 1 or 0
+            const responseText = await response.text();
+            console.log("Last answer correctness response:", responseText);
+            setIsLastAnswerCorrect(responseText === '1');
+        } catch (error) {
+            console.error('Failed to check last answer correctness:', error);
+        }
+    }
 
 
     useEffect(() => {
@@ -159,11 +186,11 @@ function QuizQuestions() {
                 quizStage === 'question' ? (
                     <QuizQuestion questionText={quizQuestions[currentQuestionIndex].question} />
                 ) : quizStage === 'answer' ? (
-                    <QuizAnswer questionOptions={quizQuestions[currentQuestionIndex].options} />
+                    <QuizAnswer questionOptions={quizQuestions[currentQuestionIndex].options} setNextStage={() => setQuizStage('answered')} />
                 ) : quizStage === 'answered' ? (
                     <QuizAnswered />
                 ) : quizStage === 'results' ? (
-                    <QuizResults isCorrect={true} />
+                    <QuizResults isCorrect={isLastAnswerCorrect} />
                 ) : (
                     <div>Invalid quiz stage.</div>
                 )
