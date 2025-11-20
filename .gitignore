@@ -1,1 +1,4 @@
 .env
+/server/data/quiz
+/server/data/user_scores
+/client/src/assets/quiz_images
